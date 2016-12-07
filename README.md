@@ -17,3 +17,21 @@ Examples
   print_r $formio->ssoToken('test@example.com');
 ?>
 ```
+
+**Login as an employee and create a resource.**
+```
+<?php
+  require_once('Formio.php');
+  $formio = new Formio('https://myproject.form.io', array(
+    'resource' => 'employee'
+  ));
+  $employee = $formio->login('employee@example.com', '123testing');
+
+  // This will now post using the Employee's auth token.
+  $formio->post('report', array(
+    'employee' => $employee['_id'],
+    'status' => 'opened',
+    'title' => 'TPS Report'
+  ));
+?>
+```
