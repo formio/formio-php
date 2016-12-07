@@ -87,7 +87,7 @@ class Formio {
     return $retVal;
   }
 
-  private function get($path) {
+  public function get($path) {
     $url = $this->project + '/' + $path;
     $curl = curl_init();
     curl_setopt_array($curl, array(
@@ -97,7 +97,29 @@ class Formio {
     return $this->request($curl);
   }
 
-  private function post($path, $body) {
+  public function del($path) {
+    $url = $this->project + '/' + $path;
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_CUSTOMREQUEST => "DELETE"
+    ));
+    return $this->request($curl);
+  }
+
+  public function put($path, $body) {
+    $url = $this->project + '/' + $path;
+    $curl = curl_init();
+    $data = json_encode($body);
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_CUSTOMREQUEST => "PUT",
+      CURLOPT_POSTFIELDS => $data,
+    ));
+    return $this->request($curl);
+  }
+
+  public function post($path, $body) {
     $url = $this->project + '/' + $path;
     $curl = curl_init();
     $data = json_encode($body);
