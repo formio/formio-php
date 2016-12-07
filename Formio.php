@@ -131,7 +131,7 @@ class Formio {
     $body['data'][$this->options['password_field']] = $password;
     $response = $this->post($this->options['login'], $body);
     $this->token = $response['headers']['x-jwt-token'];
-    return $this->token;
+    return $response['body'];
   }
 
   /**
@@ -146,7 +146,7 @@ class Formio {
     $body['data'][$this->options['password_field']] = $password;
     $response = $this->post($this->options['register'], $body);
     $this->token = $response['headers']['x-jwt-token'];
-    return $this->token;
+    return $response['body'];
   }
 
   /**
@@ -158,10 +158,12 @@ class Formio {
    */
   public function ssoToken($id) {
     if ($this->exists($id)) {
-      return $this->login($id);
+      $this->login($id);
+      return $this->token;
     }
     else {
-      return $this->register($id);
+      $this->register($id);
+      return $this->token;
     }
   }
 }
