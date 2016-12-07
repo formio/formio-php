@@ -62,7 +62,7 @@ class Formio {
       "content-type: application/json"
     );
     if ($this->token) {
-      $headers['x-jwt-token'] = $this->token;
+      array_push($headers, 'x-jwt-token: ' . $this->token);
     }
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_ENCODING, '');
@@ -88,7 +88,7 @@ class Formio {
   }
 
   public function get($path) {
-    $url = $this->project + '/' + $path;
+    $url = $this->project . '/' . $path;
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $url,
@@ -98,7 +98,7 @@ class Formio {
   }
 
   public function del($path) {
-    $url = $this->project + '/' + $path;
+    $url = $this->project . '/' . $path;
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $url,
@@ -108,7 +108,7 @@ class Formio {
   }
 
   public function put($path, $body) {
-    $url = $this->project + '/' + $path;
+    $url = $this->project . '/' . $path;
     $curl = curl_init();
     $data = json_encode($body);
     curl_setopt_array($curl, array(
@@ -120,7 +120,7 @@ class Formio {
   }
 
   public function post($path, $body) {
-    $url = $this->project + '/' + $path;
+    $url = $this->project . '/' . $path;
     $curl = curl_init();
     $data = json_encode($body);
     curl_setopt_array($curl, array(
@@ -178,15 +178,21 @@ class Formio {
    *   2.) If so, then logs them in and returns their token.
    *   3.) If not, then it creates their account with default password and returs their token.
    */
-  public function ssoToken($id) {
+  public function sso($id) {
     if ($this->exists($id)) {
-      $this->login($id);
-      return $this->token;
+      return $this->login($id);
     }
     else {
-      $this->register($id);
-      return $this->token;
+      return $this->register($id);
     }
+  }
+
+  /**
+   * Returns the token after an sso attempt.
+   */
+  public function ssoToken($id) {
+    $this->sso($id);
+    return $this->token;
   }
 }
 ?>

@@ -27,11 +27,19 @@ Examples
   ));
   $employee = $formio->login('employee@example.com', '123testing');
 
+  // The employee object.
+  print_r($employee);
+
+  // The users token...
+  print $formio->token;
+
   // This will now post using the Employee's auth token.
-  $formio->post('report', array(
+  $resource = $formio->post('resource', array('data' => array(
     'employee' => $employee['_id'],
     'status' => 'opened',
     'title' => 'TPS Report'
-  ));
+  )));
+
+  print_r($resource['body']);
 ?>
 ```
