@@ -10,13 +10,21 @@
  *        'default_password' => '123testing'
  *      ));
  *
- *      // Checks if the user exists, create them if not, log them in if so.
+ *      // You can now do this.....
+ *      $formio->login('test@example.com', '123testing');
+ *      $formio->post('test', array(
+ *        'test' => 'test',
+ *        'test2' => 'test2'
+ *      ));
+ *
+ *      // OR.... you could create a single sign on like so...
  *      print $formio->ssoToken('test@example.com');
  *    ?>
  *
  */
 class Formio {
   public $project = '';
+  public $token = '';
   public $options = array(
     'resource' => 'user',
     'login' => 'user/login',
@@ -49,10 +57,14 @@ class Formio {
   }
 
   private function request($curl) {
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+    $headers = array(
       "cache-control: no-cache",
       "content-type: application/json"
-    ));
+    );
+    if ($this->token) {
+      $headers['x-jwt-token'] = $this->token;
+    }
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_ENCODING, '');
     curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
@@ -75,7 +87,8 @@ class Formio {
     return $retVal;
   }
 
-  private function get($url) {
+  private function get($path) {
+    $url = $this->project + '/' + $path;
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $url,
@@ -84,7 +97,8 @@ class Formio {
     return $this->request($curl);
   }
 
-  private function post($url, $body) {
+  private function post($path, $body) {
+    $url = $this->project + '/' + $path;
     $curl = curl_init();
     $data = json_encode($body);
     curl_setopt_array($curl, array(
@@ -99,32 +113,40 @@ class Formio {
    * Checks to see if a submission exists.
    */
   public function exists($id) {
-    $url = $this->project . '/' . $this->options['resource'];
-    $url .= '/exists?data.' . $this->options['id_field'] . '=' . $id;
-    $response = $this->get($url);
+    $path = $this->options['resource'];
+    $path .= '/exists?data.' . $this->options['id_field'] . '=' . $id;
+    $response = $this->get($path);
     return !!$response['body']['_id'];
   }
 
   /**
    * Log in an existing user.
    */
-  public function login($id) {
+  public function login($id, $password = '') {
     $body = array('data' => array());
     $body['data'][$this->options['id_field']] = $id;
-    $body['data'][$this->options['password_field']] = $this->options['default_password'];
-    $response = $this->post($this->project . '/' . $this->options['login'], $body);
-    return $response['headers']['x-jwt-token'];
+    if (!$password) {
+      $password = $this->options['default_password'];
+    }
+    $body['data'][$this->options['password_field']] = $password;
+    $response = $this->post($this->options['login'], $body);
+    $this->token = $response['headers']['x-jwt-token'];
+    return $this->token;
   }
 
   /**
    * Register a new user.
    */
-  public function register($id) {
+  public function register($id, $password = '') {
     $body = array('data' => array());
     $body['data'][$this->options['id_field']] = $id;
-    $body['data'][$this->options['password_field']] = $this->options['default_password'];
-    $response = $this->post($this->project . '/' . $this->options['register'], $body);
-    return $response['headers']['x-jwt-token'];
+    if (!$password) {
+      $password = $this->options['default_password'];
+    }
+    $body['data'][$this->options['password_field']] = $password;
+    $response = $this->post($this->options['register'], $body);
+    $this->token = $response['headers']['x-jwt-token'];
+    return $this->token;
   }
 
   /**
