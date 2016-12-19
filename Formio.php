@@ -159,13 +159,18 @@ class Formio {
   /**
    * Register a new user.
    */
-  public function register($id, $password = '') {
+  public function register($id, $password = '', $data = array()) {
     $body = array('data' => array());
     $body['data'][$this->options['id_field']] = $id;
     if (!$password) {
       $password = $this->options['default_password'];
     }
     $body['data'][$this->options['password_field']] = $password;
+    foreach ($data as $key => $value) {
+      if (!isset($body['data'][$key])) {
+        $body['data'][$key] = $value;
+      }
+    }
     $response = $this->post($this->options['register'], $body);
     $this->token = $response['headers']['x-jwt-token'];
     return $response['body'];
@@ -178,12 +183,12 @@ class Formio {
    *   2.) If so, then logs them in and returns their token.
    *   3.) If not, then it creates their account with default password and returs their token.
    */
-  public function sso($id) {
+  public function sso($id, $data = array()) {
     if ($this->exists($id)) {
       return $this->login($id);
     }
     else {
-      return $this->register($id);
+      return $this->register($id, '', $data);
     }
   }
 
