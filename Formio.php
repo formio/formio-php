@@ -62,7 +62,7 @@ class Formio {
       "content-type: application/json"
     );
     if ($this->token) {
-      array_push($headers, 'x-jwt-token: ' . $this->token);
+      array_push($headers, 'X-Jwt-Token: ' . $this->token);
     }
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_ENCODING, '');
@@ -152,7 +152,7 @@ class Formio {
     }
     $body['data'][$this->options['password_field']] = $password;
     $response = $this->post($this->options['login'], $body);
-    $this->token = $response['headers']['x-jwt-token'];
+    $this->token = $response['headers']['X-Jwt-Token'];
     return $response['body'];
   }
 
@@ -172,7 +172,7 @@ class Formio {
       }
     }
     $response = $this->post($this->options['register'], $body);
-    $this->token = $response['headers']['x-jwt-token'];
+    $this->token = $response['headers']['X-Jwt-Token'];
     return $response['body'];
   }
 
