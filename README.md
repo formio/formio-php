@@ -1,3 +1,12 @@
+### This repository is now considered legacy and no longer supported. Please take a look at our recent repositories and help documentation at the following links.
+
+ - https://help.form.io
+ - https://github.com/formio/formio.js
+ - https://github.com/formio/formio
+ - https://github.com/formio/react
+ - https://github.com/formio/angular
+ - https://github.com/formio/vue
+
 PHP Integration with Form.io
 ============================
 This serves as an initial PHP integration within Form.io. The intent is to make this library
